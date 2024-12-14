@@ -3,9 +3,17 @@ from math import pow
 from exceptions import *
 
 class Calculation(ABC):
-    def __init__(self,operand1: float, operand2: float):
-        self._operand1=float(operand1)
-        self._operand2=float(operand2)
+    def __init__(self,op:str ,operand1: float, operand2: float):
+        self.op=op
+
+        try:
+            self._operand1 = float(operand1)
+        except Exception as e:
+            raise IncorrectSyntax(f" invalid syntax, {operand1} isn't a number")
+        try:
+            self._operand2 = float(operand2)
+        except Exception as e:
+            raise IncorrectSyntax(f"invalid syntax,{operand2} isn't a number")
 
     @abstractmethod
     def result(self) -> float:
@@ -14,7 +22,10 @@ class Calculation(ABC):
 class Sub(Calculation):
 
     def result(self) -> float:
-        return self._operand1-self._operand2
+        if self._operand1 is None:
+            self._operand1=0
+
+        return float(self._operand1)-self._operand2
 
 class Add(Calculation):
 
@@ -64,10 +75,12 @@ class Modolo(Calculation):
             return self._operand1 % self._operand2
 
 class Negative(Calculation):
+
     def result(self) -> float:
         return -1*self._operand2
 
 class Factorial(Calculation):
+
     def result(self) -> float:
         if self._operand1 < 0:
             raise NegativeInFactorial()
@@ -79,6 +92,23 @@ class Factorial(Calculation):
                 x*=i
             return x
 
+class SumNum(Calculation):
+
+    def result(self) -> float:
+        if self._operand1 < 0:
+            raise NegativeInSum()
+
+        num=str(self._operand1)
+        sum_num=0
+
+        for x in num:
+            if x.isdigit():
+                sum_num+=int(x)
+
+        return sum_num
+
+
 Operation={
-    '-':Sub, '+':Add, '*':Mul, '/':Div, '^':Hezka, '@': Avg, '$': Max, '&':Min,'%': Modolo, '~':Negative, '!':Factorial
+    '-':Sub, '+':Add, '*':Mul, '/':Div,';':Sub, '^':Hezka, '@': Avg, '$': Max, '&':Min,'%': Modolo,
+    '~':Negative, '!':Factorial, '#':SumNum
 }
