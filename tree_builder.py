@@ -17,13 +17,13 @@ def is_closed(expression:list) -> bool:
     return count == 0
 
 
-def find_min(expression: list) -> int:
+def find_min(expression: list, start: int, end: int) -> int:
     """The function finds the operator with the lowest precedence"""
     min_op = '0'
     min_index = -1
     count = 0
 
-    for i in range(len(expression)):
+    for i in range(start,end+1):
         x=expression[i]
         if x == "(":
             count += 1
@@ -37,57 +37,91 @@ def find_min(expression: list) -> int:
     return min_index
 
 
-def build_tree(expression: list, root: TreeNode) -> TreeNode:
-    """the func build the tree that represent the expression"""
-    if not expression:
+def build_tree(expression: list, root: TreeNode, start: int, end: int) -> TreeNode:
+    """the func build the tree that represent the expression
+            Args:
+                expression (list): A list of characters representing a mathematical expression.
+                root (TreeNode): The root node of the binary tree, which will be modified to represent the expression.
+                start (int): The starting index of the current sub-expression within the list.
+                end (int): The ending index of the current sub-expression within the list.
+
+            Returns:
+                TreeNode: The root of the binary tree that represents the given expression.
+
+            Raises:
+                IncorrectSyntax: If the parentheses are unbalanced or the expression is invalid,
+                an exception is raised."""
+
+    if start > end:
         root.set_value('0')
         return root
 
-    if len(expression) == 1:
-        root.set_value(expression[0])
+    if start == end:
+        root.set_value(expression[start])
         return root
 
     #remove parentheses if needed
-    if len(expression) >= 2 and expression[0] == '(' and expression[-1] == ')':
-        if is_closed(expression):
-            expression = expression[1:-1]
-
-    #raise an error if parentheses aer empty
-    if not expression:
-        raise IncorrectSyntax("Syntax Error: parentheses '()' are empty")
+    while expression[start] == "(" and expression[end] == ")" and is_closed(expression[start:end + 1]):
+        start += 1
+        end -= 1
+        # raise an error if parentheses aer empty
+        if start > end:
+            raise IncorrectSyntax("Syntax Error: parentheses '()' are empty")
 
     #split the expression by the weakest operand.
-    min_op = find_min(expression)
+    min_op = find_min(expression,start, end)
+
+    if min_op==-1:
+        root.set_value(expression[start])
+        return root
 
     root.set_value(expression[min_op])
-    first_part, second_part = expression[:min_op], expression[(min_op + 1):]
-
-    build_tree(first_part, root.get_left())
-    build_tree(second_part, root.get_right())
+    build_tree(expression, root.get_left(), start, min_op - 1)
+    build_tree(expression, root.get_right(), min_op + 1, end)
     return root
 
 def calculate_tree(root: TreeNode)-> float:
-    """calculate the tree expression"""
+    """
+    calculate the tree expression
+    Args:
+        root (TreeNode): The root node of the binary tree representing the expression.
+
+    Returns:
+        float: The result of the evaluated expression. If the result is a whole number,
+        it is returned as an integer.
+
+    Raises:
+        IncorrectSyntax: If a leaf node's value cannot be converted to a number,
+        an exception is raised with an error message.
+        """
 
     #stopping condition
     if root.is_leaf():
-        return root.get_value()
+        try:
+            num=float(root.get_value())
+        except Exception as e:
+            raise IncorrectSyntax(f" invalid syntax, {root.get_value()} isn't a number")
+        else:
+            return num
     else:
         op1=calculate_tree(root.get_left())
         op2=calculate_tree(root.get_right())
 
-        cal= Operation[root.get_value()](root.get_value(),op1, op2)
+        cal= Operation[root.get_value()](op1, op2)
         result= cal.result()
+
+        if int(result)==result:
+            return int(result)
 
         return result
 
 
 def main():
-    expression =  ['4', '+', '.','*', '2']
+    expression =  ['2', '-', '8','*','(', '-', '(', '3', '+', '4', ')', ')']
 
     try:
         root = TreeNode()
-        root = build_tree(expression, root)
+        root = build_tree(expression, root, 0, len(expression)-1)
         result= calculate_tree(root)
     except Exception as e:
         print(e.message)

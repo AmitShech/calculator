@@ -1,7 +1,9 @@
-from tree_builder import*
+from exceptions import *
+from const_variables import *
 
 
-def change_unary(expression):
+
+def change_unary(expression:str) ->list:
     """
             Replaces the string into a list and separates the different types of minuses
 
@@ -11,10 +13,13 @@ def change_unary(expression):
             Returns:
                 expr (list): expression in list format
 
+            Raises:
+                syntax and formatting exception with the minus
            """
     i = 0
     expr = []
     sign = ""
+    soger=0
 
     while i < len(expression):
 
@@ -33,28 +38,49 @@ def change_unary(expression):
             if i == 0 or expression[i - 1] in ['(', ';']:
                 count = 0
                 while i < len(expression) and expression[i] == '-':
-                #     count += 1
-                #     i += 1
-                # if count % 2 == 1:
+                   count += 1
+                   i += 1
+                if count % 2 == 1:
                     expr.append(';')
-                    i += 1
                 continue
 
 
-            elif expression[i - 1] in OP_POWER:
+            elif OP_FORMAT.get(expression[i - 1], None) in ['x_x', '_x'] or expression[i - 1]=='-':
                 count = 0
                 sign = ""
                 while i < len(expression) and expression[i] == '-':
                     count += 1
                     i += 1
+
+                if expression[i] in OP_FORMAT:
+                    raise IncorrectSyntax(f" invalid syntax, after a sign minus cant come operat")
+
                 if count % 2 == 1:
                     sign = "-"
+                    if expression[i] == '(':
+                        expr.append('(')
+                        expr.append('~')
+                        sign = ""
+                        soger=1
+
                 continue
+
             else:
                 expr.append(expression[i])
 
         else:
             expr.append(expression[i])
+
+        if expression[i] == '(' and soger >0:
+            soger+=1
+
+        if expression[i] == ')':
+            if soger == 2:
+                expr.append(')')
+                soger=0
+            else:
+                soger-=1
+
         i += 1
 
     return expr
@@ -63,11 +89,7 @@ def change_unary(expression):
 def main():
 
     test_expressions = [
-        "-5+3",
-        "3+-5",
-        "(-5)*2",
-        "--7",
-        "5-3"
+        "2--(3+4)"
     ]
 
     for expr in test_expressions:
