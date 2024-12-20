@@ -3,11 +3,11 @@ from exceptions import *
 from const_variables import *
 
 
-def infix_to_postfix(infix: str) -> list:
+def infix_to_postfix(infix: list) -> list:
     """Convert an infix mathematical expression to postfix notation.
 
     Args:
-        infix (str): The infix expression to be converted.
+        infix (list): The infix expression to be converted.
 
     Returns:
         list: A list representing the postfix expression.
