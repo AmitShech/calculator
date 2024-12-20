@@ -98,10 +98,12 @@ class SumNum(Calculation):
         if self._operand1 < 0:
             raise NegativeInSum()
 
-        num=str(self._operand1)
+        if 'e' in str(self._operand1):
+            raise SumOfDigitsEError()
+
         sum_num=0
 
-        for x in num:
+        for x in str(self._operand1):
             if x.isdigit():
                 sum_num+=int(x)
 

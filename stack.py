@@ -3,7 +3,15 @@ from exceptions import *
 from const_variables import *
 
 
-def infix_to_postfix(infix):
+def infix_to_postfix(infix: str) -> list:
+    """Convert an infix mathematical expression to postfix notation.
+
+    Args:
+        infix (str): The infix expression to be converted.
+
+    Returns:
+        list: A list representing the postfix expression.
+    """
     stack=[]
     postfix=[]
 
@@ -31,8 +39,23 @@ def infix_to_postfix(infix):
     return postfix
 
 
-def calculate_postfix(expr):
+def calculate_postfix(expr:list):
+    """Evaluate a postfix expression and return the result.
+    Args:
+        expr (list): The postfix expression as a list of operands and operators.
+
+    Returns:
+        int or float: The result of evaluating the postfix expression.
+
+    Raises:
+        IncorrectSyntax: If the expression has invalid syntax or contains invalid numbers."""
     stack = []
+
+    if len(expr)==1:
+        try:
+            return float(expr[0])
+        except Exception as e:
+            raise IncorrectSyntax(f" invalid syntax, {expr[0]} isn't a number")
 
     for i in range(len(expr)):
         x=expr[i]
@@ -54,11 +77,6 @@ def calculate_postfix(expr):
             stack.append(result)
 
     result=stack.pop()
-    try:
-        result = float(result)
-    except Exception as e:
-        raise IncorrectSyntax(f" invalid syntax, {result} isn't a number")
-
 
     if int(result) == result:
         return int(result)
