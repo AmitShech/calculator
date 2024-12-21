@@ -63,8 +63,8 @@ def right_format(expression):
             elif OP_FORMAT[x] == 'x_':
                 if not (expression[i-1].isdigit() or expression[i-1] in ['!', '#','.',')']) :
                     raise NotInFormat(expression[i-1],x)
-                if i<len(expression)-1 and (expression[i+1] not in BINARY_OP and expression[i+1]!=')'):
-                    raise NotInFormat(x,expression[i+1])
+                if i < len(expression) - 1 and (expression[i + 1].isdigit() or expression[i + 1] in ['~', '(']):
+                    raise NotInFormat(x, expression[i + 1])
 
             elif OP_FORMAT[x] == '_x':
                 if not (expression[i-1] in BINARY_OP or expression[i-1]!='(') and i>0:
