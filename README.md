@@ -32,6 +32,7 @@ This project is a calculator program designed to perform  arithmetic operations
 2. Navigate to the project directory:
    ```bash
    cd calculator
+   cd src
    ```
 
 ## Usage
